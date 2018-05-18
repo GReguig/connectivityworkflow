@@ -1,0 +1,7 @@
+nipype
+nilearn
+networkx
+pandas
+matplotlib
+bids
+numpy
