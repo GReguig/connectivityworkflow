@@ -54,6 +54,7 @@ def RunConnectivityWorkflow(path, outDir,workdir):
     
     
     
+    
 if __name__ == "__main__" : 
     #Argument parser
     parser = argparse.ArgumentParser(description="Path to BIDS Dataset")
