@@ -8,12 +8,6 @@ Created on Wed May  9 10:36:38 2018
 from bids.grabbids import BIDSLayout
 from nipype import Function, Node
 from os.path import join as opj
-"""
-from signal_extraction_freesurfer import SignalExtractionFreeSurfer
-from confounds_selector import getConfoundsReaderNode
-from connectivity_calculation import ConnectivityCalculation
-from nipype import Workflow
-"""
 
 def get_BidsData(pathBids, subject, session, outputDir):
     """

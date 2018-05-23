@@ -6,10 +6,10 @@ Created on Mon May  7 15:56:02 2018
 @author: ghiles.reguig
 """
 import argparse
-from data_bids_grabber import GetBidsDataGrabberNode
-from confounds_selector import getConfoundsReaderNode
-from signal_extraction_freesurfer import SignalExtractionFreeSurfer
-from connectivity_calculation import ConnectivityCalculation
+from connectivityworkflow.data_bids_grabber import GetBidsDataGrabberNode
+from connectivityworkflow.confounds_selector import getConfoundsReaderNode
+from connectivityworkflow.signal_extraction_freesurfer import SignalExtractionFreeSurfer
+from connectivityworkflow.connectivity_calculation import ConnectivityCalculation
 from nipype import Workflow, Node, config
 from os.path import join as opj
 import json
