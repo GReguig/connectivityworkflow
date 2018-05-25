@@ -5,6 +5,7 @@ connectivityworkflow/connectivity_calculation.py
 connectivityworkflow/connectivity_workflow.py
 connectivityworkflow/data_bids_grabber.py
 connectivityworkflow/signal_extraction_freesurfer.py
+connectivityworkflow/workflow_builder.py
 connectivityworkflow.egg-info/PKG-INFO
 connectivityworkflow.egg-info/SOURCES.txt
 connectivityworkflow.egg-info/dependency_links.txt

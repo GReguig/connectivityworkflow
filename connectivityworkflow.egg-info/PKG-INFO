@@ -1,6 +1,6 @@
 Metadata-Version: 1.0
 Name: connectivityworkflow
-Version: 0.0.1
+Version: 0.0.3
 Summary: A workflow for graph theory measure calculations from FMRI data
 Home-page: https://github.com/GReguig/connectivityworkflow
 Author: Reguig Ghiles
