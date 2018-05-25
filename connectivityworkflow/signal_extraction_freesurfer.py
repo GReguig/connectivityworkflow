@@ -36,7 +36,7 @@ class SignalExtractionFreeSurferInputSpec(BaseInterfaceInputSpec):
     confoundsName = trait.traits.Str(mandatory=False, usedefault=None, desc="Name of the set of counfounds to use for signal cleaning")
     lutFile = trait.File(exists=True, mandatory=False, usedefault=None,
                          desc="FreeSurfer's Color Looking Up Table")
-    output_dir = trait.Directory(exists=True, mandatory=False, usedefault=".")
+    output_dir = trait.traits.Str(mandatory=False, usedefault=".")
     
 class SignalExtractionFreeSurferOutputSpec(TraitedSpec):
     time_series = trait.traits.Array(desc="Array containing time series/RoI. Dimensions : (timestamps x RoI)")

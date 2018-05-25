@@ -24,15 +24,15 @@ def BuildConnectivityWorkflow(path, outDir):
     connectivityCalculator.inputs.absolute = True
     #Workflow connections
     connectivityWorkflow.connect([
-            (inputNode, confoundsReader, [("confounds","filepath")]),
-            (inputNode, signalExtractor, [("aparcaseg","roi_file"),
+            (inputNode, confoundsReader, [("confounds", "filepath")]),
+            (inputNode, signalExtractor, [("aparcaseg", "roi_file"),
                                           ("preproc", "fmri_file"),
                                           ("outputDir", "output_dir")]),
-            (confoundsReader, signalExtractor, [("values","confounds"),
-                                                ("confName","confoundsName")]),
-            (signalExtractor, connectivityCalculator, [("time_series","time_series"),
+            (inputNode, connectivityCalculator, [("outputDir", "output_dir")]),
+            (confoundsReader, signalExtractor, [("values", "confounds"),
+                                                ("confName", "confoundsName")]),
+            (signalExtractor, connectivityCalculator, [("time_series", "time_series"),
                                                        ("roiLabels", "labels"),
-                                                       ("confName", "plotName")]),
-            (inputNode, connectivityCalculator, [("outputDir", "output_dir")])
+                                                       ("confName", "plotName")])
             ])
     return connectivityWorkflow

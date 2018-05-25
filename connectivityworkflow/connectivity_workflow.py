@@ -11,41 +11,6 @@ from os.path import join as opj
 import json
 from connectivityworkflow.workflow_builder import BuildConnectivityWorkflow
 
-"""
-def BuildConnectivityWorkflow(path, outDir):
-    #Workflow Initialization
-    connectivityWorkflow = Workflow(name="connectivityWorkflow")
-    #Input Node for reading BIDS Data
-    inputNode = GetBidsDataGrabberNode(path)
-    inputNode.inputs.outDir = outDir
-    #Confound selector
-    confoundsReader = getConfoundsReaderNode()
-    confoundsReader.iterables = [('regex', [("[^(Cosine|aCompCor|tCompCor|AROMAAggrComp)\d+]", "minimalConf"),
-                                              ("[^(Cosine|tCompCor|AROMAAggrComp)\d+]","aCompCor"),
-                                              ("[^(Cosine|aCompCor|AROMAAggrComp)\d+]", "tCompCor"),
-                                              ("[^(Cosine|aCompCor|tCompCor)\d+]", "Aroma")])]
-    #Signal Extraction
-    signalExtractor = Node(SignalExtractionFreeSurfer(), name="SignalExtractor")
-    #Connectivity Calculation
-    connectivityCalculator = Node(ConnectivityCalculation(), name="ConnectivityCalculator")
-    connectivityCalculator.iterables = [("kind", ["correlation", "covariance", "precision", "partial correlation"])]
-    connectivityCalculator.inputs.absolute = True
-    #Workflow connections
-    connectivityWorkflow.connect([
-            (inputNode, confoundsReader, [("confounds","filepath")]),
-            (inputNode, signalExtractor, [("aparcaseg","roi_file"),
-                                          ("preproc", "fmri_file"),
-                                          ("outputDir", "output_dir")]),
-            (confoundsReader, signalExtractor, [("values","confounds"),
-                                                ("confName","confoundsName")]),
-            (signalExtractor, connectivityCalculator, [("time_series","time_series"),
-                                                       ("roiLabels", "labels"),
-                                                       ("confName", "plotName")]),
-            (inputNode, connectivityCalculator, [("outputDir", "output_dir")])
-            ])
-    return connectivityWorkflow
-"""
-
 def RunConnectivityWorkflow(path, outDir,workdir, conf_file=None):
     
     if conf_file is not None : 
@@ -78,8 +43,7 @@ if __name__ == "__main__" :
     workdir = args.workdir
     conf = args.conf
     outDir = opj(path,"derivatives","connectivityWorkflow")
-    
     print("Results will be written in {}".format(outDir))
-    #Build the workflow
+    #Build and run the workflow
     RunConnectivityWorkflow(path, outDir, workdir, conf)
     
