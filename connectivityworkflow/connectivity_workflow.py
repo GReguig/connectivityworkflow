@@ -46,4 +46,5 @@ if __name__ == "__main__" :
     print("Results will be written in {}".format(outDir))
     #Build and run the workflow
     RunConnectivityWorkflow(path, outDir, workdir, conf)
+    print("ConnectivityWorkflow Done")
     

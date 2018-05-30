@@ -64,9 +64,9 @@ def joinFeatures(data, output_dir, prefix, confName, kindConn):
     df = pd.DataFrame()
     for feature in data :
         #If local measures (1 per node)
-        featureVal = feature.values()[0]
+        featureVal = list(feature.values())[0]
         if not isinstance(featureVal, float):
-            serie = pd.Series(featureVal.values(), index=featureVal.keys())
+            serie = pd.Series(list(featureVal.values()), index=featureVal.keys())
             df[feature.keys()[0]] = serie
         else:
             df[feature.keys()[0]] = featureVal
