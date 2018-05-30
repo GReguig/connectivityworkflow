@@ -36,8 +36,7 @@ def BuildConnectivityWorkflow(path, outDir):
             (signalExtractor, connectivityCalculator, [("time_series","time_series"),
                                                        ("roiLabels", "labels"),
                                                        ("confName", "plotName")]),
-            (inputNode, connectivityCalculator, [("outputDir", "output_dir"),
-                                                 ("prefix","prefix")])
+            (inputNode, connectivityCalculator, [("outputDir", "output_dir")])
             ])
     ## GRAPH
 
