@@ -46,8 +46,8 @@ def BuildConnectivityWorkflow(path, outDir):
     graphFeature = MapNode(Function(function=computeFeature, input_names=["graph","func","nameFeature"],
                       output_names=["feature"]), name="FeatureCalculator", iterfield=["func","nameFeature"])
     
-    graphFeature.inputs.func = [networkx.clustering, networkx.algorithms.efficiency.local_efficiency, 
-                                networkx.algorithms.eficiency.global_efficiency, networkx.degree, 
+    graphFeature.inputs.func = [networkx.clustering, networkx.algorithms.local_efficiency, 
+                                networkx.algorithms.global_efficiency, networkx.degree, 
                                 networkx.algorithms.centrality.betweenness_centrality]
     graphFeature.inputs.nameFeature = ["clustering", "local_efficiency", "global_efficiency", "degree", "betweenness_centrality"]
     #Join Features
