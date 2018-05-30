@@ -29,7 +29,7 @@ class ConnectivityCalculationInputSpec(BaseInterfaceInputSpec):
                              desc=".tsv file containing a time serie for each RoI")
     kind = trait.traits.Enum('correlation', 'partial correlation', 'tangent', 'covariance', 'precision', usedefault="correlation",mandatory=False,  
                      desc="Measure of connectivity to compute, must be one of {'correlation', 'partial_correlation', 'tangent', 'covariance', 'precision'}. By default, correlation is used.")
-    output_dir = trait.Directory(exists=True, mandatory=True, usedefault=".",
+    output_dir = trait.Str(mandatory=True, usedefault=".",
                                  desc="Directory to store generated file")
     absolute = trait.traits.Bool(mandatory=False, usedefault=False, 
                                  desc="Whether to use the absolute value of the connectivity measure. By default, False.")
