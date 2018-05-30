@@ -36,8 +36,9 @@ class SignalExtractionFreeSurferInputSpec(BaseInterfaceInputSpec):
     confoundsName = trait.traits.Str(mandatory=False, usedefault=None, desc="Name of the set of counfounds to use for signal cleaning")
     lutFile = trait.File(exists=True, mandatory=False, usedefault=None,
                          desc="FreeSurfer's Color Looking Up Table")
-    output_dir = trait.traits.Str(mandatory=False, usedefault=".")
-    
+    output_dir = trait.Directory(exists=False, mandatory=False, usedefault=".")
+    prefix = trait.traits.Str(mandatory=False, usedefault="", desc="Prefix of the bids files")
+        
 class SignalExtractionFreeSurferOutputSpec(TraitedSpec):
     time_series = trait.traits.Array(desc="Array containing time series/RoI. Dimensions : (timestamps x RoI)")
     roiLabels = trait.traits.List(desc="List of labels associated with each RoI")
@@ -75,7 +76,13 @@ class SignalExtractionFreeSurfer(NilearnBaseInterface, SimpleInterface):
         #DataFrame containing time_series/RoI
         time_seriesDF = pd.DataFrame(roiTimeSeries, columns=rois_Present_Names)
         #Name of the OutPutFile
-        outFile = os.path.join(self.inputs.output_dir, self.inputs.confoundsName+"TimeSeriesRoI.tsv")
+        directory = os.path.join(self.inputs.output_dir,"time_series")
+        if not os.path.exists(directory):
+            try:
+                os.makedirs(directory)
+            except Exception:
+                print("exception makedirs")
+        outFile = os.path.join(directory, self.inputs.prefix+self.inputs.confoundsName+"TimeSeriesRoI.tsv")
         #Output value
         self._results["time_series"] = time_seriesDF.values
         self._results["roiLabels"] = list(time_seriesDF.columns)

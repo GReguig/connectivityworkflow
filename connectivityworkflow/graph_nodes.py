@@ -38,6 +38,7 @@ def NodePandasAdj2Nx():
     
 def computeFeature(graph, func, nameFeature):
     import networkx
+    import connectivityworkflow.graph_utils
     feature = func(graph)
     useless=0
     try:

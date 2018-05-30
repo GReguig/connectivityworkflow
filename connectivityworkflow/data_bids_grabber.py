@@ -19,16 +19,18 @@ def get_BidsData(pathBids, subject, session, outputDir):
 
     layout = BIDSLayout(pathBids)
     try :
+        prep = layout.get(type="preproc", space="T1w", subject=subject, session=session)[0]
         aparcaseg = layout.get(type="roi", label="aparcaseg", space="T1w", subject=subject, session=session)[0].filename
-        preproc = layout.get(type="preproc", space="T1w", subject=subject, session=session)[0].filename
+        preproc = prep.filename
         confounds = layout.get(type="confounds", subject=subject, session=session)[0].filename
+        prefix = "sub-"+prep.subject+"_ses-"+prep.session+"_task-"+prep.task+"-"+prep.type+"_"
     except IndexError :
         raise Exception("Data missing for subject : {}, session : {}".format(subject, session))
         
-    outDir = opj(outputDir, subject, session, "func")
+    outDir = opj(outputDir, "sub-"+subject, "ses-"+session, "func")
     if not os.path.exists(outDir):
         os.makedirs(outDir)
-    return aparcaseg, preproc, confounds, outDir
+    return aparcaseg, preproc, confounds, outDir, prefix
 
 def GetBidsDataGrabberNode(pathBids):
     layout = BIDSLayout(pathBids)
@@ -36,7 +38,7 @@ def GetBidsDataGrabberNode(pathBids):
     sessions = layout.get_sessions()
     print("Found {} subjects and {} sessions in the dataset".format(len(subjects), len(sessions)))
     #Initialize the dataGrabber node
-    BIDSDataGrabber = Node(Function(function=get_BidsData, input_names=["pathBids","subject","session", "outputDir"], output_names=["aparcaseg", "preproc", "confounds", "outputDir"]), name="FunctionalDataGrabber")
+    BIDSDataGrabber = Node(Function(function=get_BidsData, input_names=["pathBids","subject","session", "outputDir"], output_names=["aparcaseg", "preproc", "confounds", "outputDir", "prefix"]), name="FunctionalDataGrabber")
     #Specify path to dataset
     BIDSDataGrabber.inputs.pathBids = pathBids    
     BIDSDataGrabber.inputs.outputDir = opj(pathBids, "derivatives", "connectivityWorkflow")

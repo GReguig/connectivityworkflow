@@ -36,7 +36,8 @@ def BuildConnectivityWorkflow(path, outDir):
             (signalExtractor, connectivityCalculator, [("time_series","time_series"),
                                                        ("roiLabels", "labels"),
                                                        ("confName", "plotName")]),
-            (inputNode, connectivityCalculator, [("outputDir", "output_dir")])
+            (inputNode, connectivityCalculator, [("outputDir", "output_dir"),
+                                                 ("prefix","prefix")])
             ])
     ## GRAPH
 
@@ -45,8 +46,10 @@ def BuildConnectivityWorkflow(path, outDir):
     graphFeature = MapNode(Function(function=computeFeature, input_names=["graph","func","nameFeature"],
                       output_names=["feature"]), name="FeatureCalculator", iterfield=["func","nameFeature"])
     
-    graphFeature.inputs.func = [networkx.degree, networkx.density, networkx.betweenness_centrality, networkx.algorithms.clustering, networkx.algorithms.transitivity, networkx.average_shortest_path_length]
-    graphFeature.inputs.nameFeature = ["Degree", "Density", "Betweenness-Centrality", "Average-Clustering", "Global-Clustering", "Average-Shortest-Path-Length"]
+    graphFeature.inputs.func = [networkx.clustering, networkx.algorithms.efficiency.local_efficiency, 
+                                networkx.algorithms.eficiency.global_efficiency, networkx.degree, 
+                                networkx.algorithms.centrality.betweenness_centrality]
+    graphFeature.inputs.nameFeature = ["clustering", "local_efficiency", "global_efficiency", "degree", "betweenness_centrality"]
     #Join Features
     joinFeatures = NodeJoinFeatures()
     

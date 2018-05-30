@@ -16,7 +16,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 plt.switch_backend("agg")
-
 """
 Class for Nilearn Interface
 """
@@ -29,7 +28,7 @@ class ConnectivityCalculationInputSpec(BaseInterfaceInputSpec):
                              desc=".tsv file containing a time serie for each RoI")
     kind = trait.traits.Enum('correlation', 'partial correlation', 'tangent', 'covariance', 'precision', usedefault="correlation",mandatory=False,  
                      desc="Measure of connectivity to compute, must be one of {'correlation', 'partial_correlation', 'tangent', 'covariance', 'precision'}. By default, correlation is used.")
-    output_dir = trait.Str(mandatory=True, usedefault=".",
+    output_dir = trait.Directory(exists=False, mandatory=True, usedefault=".",
                                  desc="Directory to store generated file")
     absolute = trait.traits.Bool(mandatory=False, usedefault=False, 
                                  desc="Whether to use the absolute value of the connectivity measure. By default, False.")
@@ -37,9 +36,13 @@ class ConnectivityCalculationInputSpec(BaseInterfaceInputSpec):
                                desc="List of labels associated with each time_serie")
     plotName = trait.traits.Str(mandatory=False, usedefault=None,
                                 desc="Title of the connectivity matrix")
+    prefix = trait.traits.Str(mandatory=False, usedefault="", desc="Prefix of the bids files")
+
     
 class ConnectivityCalculationOutputSpec(TraitedSpec):
     connectivityMatrix = trait.traits.Array(desc="Matrix of connectivity computed")
+    dfPath = trait.traits.File(exists=True, desc="DataFrame containing the connectivity matrix")
+    kind = trait.traits.Str(desc="Kind of connectivity calculated")
     
 class ConnectivityCalculation(NilearnBaseInterface, SimpleInterface):
     
@@ -49,10 +52,14 @@ class ConnectivityCalculation(NilearnBaseInterface, SimpleInterface):
     def _run_interface(self, runtime):
         self._check_kind()
         connKind = self.inputs.kind
-        title = self.inputs.plotName+" "+connKind if self.inputs.plotName else  connKind
+        title = self.inputs.plotName+"-"+connKind if self.inputs.plotName else  connKind
+        title = title.replace(" ", "-")
         time_series = self.inputs.time_series
-        plotpath = os.path.join(self.inputs.output_dir, title)
-        connMatrixPath = os.path.join(self.inputs.output_dir, title)
+        directory = os.path.join(self.inputs.output_dir,"connectivityMeasures", title)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        plotpath = os.path.join(directory, self.inputs.prefix+title)
+        connMatrixPath = os.path.join(directory, self.inputs.prefix+title)
         labels = list(self.inputs.labels) if self.inputs.labels else None
         print("Starting connectivity calculation...")
         conn_measure = ConnectivityMeasure(kind=connKind)
@@ -65,10 +72,12 @@ class ConnectivityCalculation(NilearnBaseInterface, SimpleInterface):
         print("Connectivity matrix computed.\nPlotting...")
         plt.figure()
         plotting.plot_matrix(conn_matrix, colorbar=True, labels=labels, title=title, figure=(10,8))
-        plt.savefig(plotpath)
+        plt.savefig(plotpath+".png")
         connDataFrame = pd.DataFrame(conn_matrix, columns = labels, index=labels)
-        connDataFrame.to_csv(connMatrixPath, sep="\t")
+        connDataFrame.to_csv(connMatrixPath+".tsv", sep="\t")
         self._results["connectivityMatrix"] = conn_matrix
+        self._results["dfPath"] = connMatrixPath+".tsv"
+        self._results["kind"] = connKind
         print("Connectivity calculation successfully finished")
         return runtime
                     
