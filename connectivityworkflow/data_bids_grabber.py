@@ -48,8 +48,47 @@ def GetBidsDataGrabberNode(pathBids):
     #Return the node 
     return BIDSDataGrabber
 
+
+def get_bids_surf_data(path_bids, subject, session, output_dir):
+    """
+    Function  to get the aparcaseg and the pre-processed BOLD fmri filepaths from BIDS dataset
+    """
+    from bids.grabbids import BIDSLayout
+    from os.path import join as opj
+    import os
+
+    layout = BIDSLayout(path_bids)
+    try :
+        layout_surfs = layout.get(space="fsaverage", subject=subject, session=session)
+        surfaces = [hemisphere.filename for hemisphere in layout_surfs]
+        confounds = layout.get(type="confounds", subject=subject, session=session)[0].filename
+        prefix = "sub-"+subject+"_ses-"+session+"_task-"+layout_surfs[0].task+"-fsaverage_"
+    except IndexError :
+        raise Exception("Data missing for subject : {}, session : {}".format(subject, session))
+        
+    outDir = opj(output_dir, "sub-"+subject, "ses-"+session, "func")
+    if not os.path.exists(outDir):
+        os.makedirs(outDir)
+    return surfaces, confounds, outDir, prefix
+
+def get_bids_surf_data_node(path_bids):
+    layout = BIDSLayout(path_bids)
+    subjects = layout.get_subjects()
+    sessions = layout.get_sessions()
+    print("Found {} subjects and {} sessions in the dataset".format(len(subjects), len(sessions)))
+    bids_data_grabber = Node(Function(function = get_bids_surf_data, 
+                                      input_names=["path_bids", "subject", "session", "output_dir"],
+                                      output_names=["surfaces","condounds","outDir","prefix"],
+                                      name="SurfaceDataGrabber"))    
+    bids_data_grabber.inputs.path_bids = path_bids
+    bids_data_grabber.inputs.output_dir = opj("pathBids","derivatives","connectivityWorkflowSurface")
+    bids_data_grabber.iterables = [("subject",subjects), ("session",sessions)]
+    return bids_data_grabber
+
 ################### T E S T 
 """
+pathBids = "/export/dataCENIR/users/ghiles.reguig/testBIDSB0/"
+
 l = BIDSLayout(pathBids)
 
 BIDSDataGrabber = Node(Function(function=get_BidsData, input_names=["pathBids", "subject", "session"], 

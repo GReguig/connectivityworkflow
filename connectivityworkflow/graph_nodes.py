@@ -66,10 +66,10 @@ def joinFeatures(data, output_dir, prefix, confName, kindConn):
         #If local measures (1 per node)
         featureVal = list(feature.values())[0]
         if not isinstance(featureVal, float):
-            serie = pd.Series(list(featureVal.values()), index=featureVal.keys())
-            df[feature.keys()[0]] = serie
+            serie = pd.Series(list(featureVal.values()), index=list(featureVal.keys()))
+            df[list(feature.keys())[0]] = serie
         else:
-            df[feature.keys()[0]] = featureVal
+            df[list(feature.keys())[0]] = featureVal
     outdir = opj(output_dir,"GraphMeasures")
     if not os.path.exists(outdir):
         os.makedirs(outdir)
@@ -79,9 +79,6 @@ def joinFeatures(data, output_dir, prefix, confName, kindConn):
 def NodeJoinFeatures():
     node = Node(Function(function=joinFeatures, input_names=["data", "prefix","output_dir", "confName", "kindConn"], output_names=["graphFeatures"]), name="JoinFeatures")
     return node 
-
-def ShowRes(data):
-    print("\n\nGot : {}\n\n".format(data))
 
 ########################### T E S T #######
 """
