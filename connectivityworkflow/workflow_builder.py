@@ -2,6 +2,8 @@ from connectivityworkflow.data_bids_grabber import GetBidsDataGrabberNode, get_b
 from connectivityworkflow.confounds_selector import getConfoundsReaderNode
 from connectivityworkflow.signal_extraction_freesurfer import SignalExtractionFreeSurfer
 from connectivityworkflow.connectivity_calculation import ConnectivityCalculation
+from connectivityworkflow.surface_processing import get_time_series_extractor_node
+from connectivityworkflow.connectivity_utils import get_p_val_mask_node
 from nipype import Workflow, Node, MapNode
 import networkx
 from connectivityworkflow.graph_nodes import NodePandasAdj2Nx, computeFeature, Function, NodeJoinFeatures
@@ -68,7 +70,8 @@ def BuildConnectivityWorkflow(path, outDir):
     return connectivityWorkflow
 
 
-def BuildConnectivityWorkflowSurface(path, outDir):
+def BuildConnectivityWorkflowSurface(path, outDir, lh_annot="/export/dataCENIR/users/ghiles.reguig/AtlasGordon/Gordon333_FSannot/lh.Gordon333.annot", 
+                                     rh_annot="/export/dataCENIR/users/ghiles.reguig/AtlasGordon/Gordon333_FSannot/rh.Gordon333.annot"):
     #Workflow Initialization
     connectivityWorkflow = Workflow(name="connectivityWorkflow")
     #Input Node for reading BIDS Data
@@ -77,20 +80,23 @@ def BuildConnectivityWorkflowSurface(path, outDir):
     #Confound selector
     confoundsReader = getConfoundsReaderNode()
     confoundsReader.iterables = [('regex', [("[^(Cosine|aCompCor|tCompCor|AROMAAggrComp)\d+]", "minimalConf"),
+                                            ("[^(Cosine|aCompCor|tCompCor|AROMAAggrComp|GlobalSignal)\d+]","minimalConfNoGlobal"),
                                               ("[^(Cosine|tCompCor|AROMAAggrComp)\d+]","aCompCor"),
                                               ("[^(Cosine|aCompCor|AROMAAggrComp)\d+]", "tCompCor"),
                                               ("[^(Cosine|aCompCor|tCompCor)\d+]", "Aroma")])]
     #Signal Extraction
-    signalExtractor = Node(SignalExtractionFreeSurfer(), name="SignalExtractor")
+    signalExtractor = get_time_series_extractor_node()
+    signalExtractor.inputs.lh_annot = lh_annot
+    signalExtractor.inputs.rh_annot = rh_annot
     #Connectivity Calculation
     connectivityCalculator = Node(ConnectivityCalculation(), name="ConnectivityCalculator")
-    connectivityCalculator.iterables = [("kind", ["correlation", "covariance", "precision", "partial correlation"])]
+    connectivityCalculator.iterables = [("kind", ["correlation", "covariance", "precision", "partial correlation", "tangent"])]
     connectivityCalculator.inputs.absolute = True
     #Workflow connections
     connectivityWorkflow.connect([
             (inputNode, confoundsReader, [("confounds","filepath")]),
-            (inputNode, signalExtractor, [("aparcaseg","roi_file"),
-                                          ("preproc", "fmri_file"),
+            (inputNode, signalExtractor, [("lh_surf","lh_surf"),
+                                          ("rh_surf", "rh_surf"),
                                           ("outputDir", "output_dir"),
                                           ("prefix", "prefix")]),
             (confoundsReader, signalExtractor, [("values","confounds"),
@@ -99,7 +105,7 @@ def BuildConnectivityWorkflowSurface(path, outDir):
                                                        ("roiLabels", "labels"),
                                                        ("confName", "plotName")]),
             (inputNode, connectivityCalculator, [("outputDir", "output_dir"),
-                                                 ("prefix","prefix")])
+                                                 ("prefix", "prefix")])
             ])
     ## GRAPH
 
@@ -108,11 +114,9 @@ def BuildConnectivityWorkflowSurface(path, outDir):
     graphFeature = MapNode(Function(function=computeFeature, input_names=["graph","func","nameFeature"],
                       output_names=["feature"]), name="FeatureCalculator", iterfield=["func","nameFeature"])
     
-    graphFeature.inputs.func = [networkx.clustering, networkx.algorithms.local_efficiency, 
-                                networkx.algorithms.global_efficiency, networkx.degree, 
+    graphFeature.inputs.func = [networkx.clustering, networkx.degree, 
                                 networkx.algorithms.centrality.betweenness_centrality]
-    graphFeature.inputs.nameFeature = ["clustering", "local_efficiency", 
-                                       "global_efficiency", "degree", 
+    graphFeature.inputs.nameFeature = ["clustering", "degree", 
                                        "betweenness_centrality"]
     #Join Features
     joinFeatures = NodeJoinFeatures()
@@ -128,3 +132,13 @@ def BuildConnectivityWorkflowSurface(path, outDir):
             ])
 
     return connectivityWorkflow
+
+############################# T E S T ###########################
+"""
+path = "/export/dataCENIR/users/ghiles.reguig/testBIDSB0"
+wf = BuildConnectivityWorkflowSurface(path, ".")
+
+wf.run(plugin='MultiProc', plugin_args={'n_procs' : 28})
+
+
+"""

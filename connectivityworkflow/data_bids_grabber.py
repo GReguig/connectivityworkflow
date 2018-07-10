@@ -61,6 +61,10 @@ def get_bids_surf_data(path_bids, subject, session, output_dir):
     try :
         layout_surfs = layout.get(space="fsaverage", subject=subject, session=session)
         surfaces = [hemisphere.filename for hemisphere in layout_surfs]
+        if surfaces[0].find(".R.") != -1 :
+            rh_surf, lh_surf = surfaces[0], surfaces[1]
+        else : 
+            rh_surf, lh_surf = surfaces[1], surfaces[0]
         confounds = layout.get(type="confounds", subject=subject, session=session)[0].filename
         prefix = "sub-"+subject+"_ses-"+session+"_task-"+layout_surfs[0].task+"-fsaverage_"
     except IndexError :
@@ -68,8 +72,9 @@ def get_bids_surf_data(path_bids, subject, session, output_dir):
         
     outDir = opj(output_dir, "sub-"+subject, "ses-"+session, "func")
     if not os.path.exists(outDir):
+        print("\n\n{} created\n\n".format(outDir))
         os.makedirs(outDir)
-    return surfaces, confounds, outDir, prefix
+    return lh_surf, rh_surf, confounds, outDir, prefix
 
 def get_bids_surf_data_node(path_bids):
     layout = BIDSLayout(path_bids)
@@ -78,10 +83,10 @@ def get_bids_surf_data_node(path_bids):
     print("Found {} subjects and {} sessions in the dataset".format(len(subjects), len(sessions)))
     bids_data_grabber = Node(Function(function = get_bids_surf_data, 
                                       input_names=["path_bids", "subject", "session", "output_dir"],
-                                      output_names=["surfaces","condounds","outDir","prefix"],
-                                      name="SurfaceDataGrabber"))    
+                                      output_names=["lh_surf","rh_surf","confounds","outputDir","prefix"]),
+                                      name="SurfaceDataGrabber")    
     bids_data_grabber.inputs.path_bids = path_bids
-    bids_data_grabber.inputs.output_dir = opj("pathBids","derivatives","connectivityWorkflowSurface")
+    bids_data_grabber.inputs.output_dir = opj(path_bids,"derivatives","connectivityWorkflowSurface")
     bids_data_grabber.iterables = [("subject",subjects), ("session",sessions)]
     return bids_data_grabber
 

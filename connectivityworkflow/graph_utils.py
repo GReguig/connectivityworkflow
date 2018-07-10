@@ -33,10 +33,13 @@ def computeFeature(graph, func, nameFeature):
     return {nameFeature : feature}
 
 
-
+def computeHubness(graph, outdir):
+    import networkx as nx 
+    hubness_matrix = nx.algorithms.hub_matrix(graph)
+    
 
 ################### T  E S T ############
-    
+"""
 
 pathConn = ("/export/dataCENIR/users/ghiles.reguig/testBIDSB0/derivatives/"
             "connectivityWorkflow/sub-10110GEF/ses-M0/func/"
@@ -44,3 +47,4 @@ pathConn = ("/export/dataCENIR/users/ghiles.reguig/testBIDSB0/derivatives/"
             "sub-10110GEF_ses-M0_task-rest-preproc_Aroma-precision.tsv")
 
 g = pandas_to_nx(pathConn)
+"""

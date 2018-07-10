@@ -9,7 +9,7 @@ import argparse
 from nipype import config
 from os.path import join as opj
 import json
-from connectivityworkflow.workflow_builder import BuildConnectivityWorkflow
+from connectivityworkflow.workflow_builder import BuildConnectivityWorkflow, BuildConnectivityWorkflowSurface
 
 def RunConnectivityWorkflow(path, outDir,workdir, conf_file=None):
     
@@ -22,9 +22,10 @@ def RunConnectivityWorkflow(path, outDir,workdir, conf_file=None):
     plugin_args = config.get("execution","plugin_args")
     if plugin_args is not None : 
         plugin_args = eval(plugin_args)
-    wf = BuildConnectivityWorkflow(path,outDir)
+    wf = BuildConnectivityWorkflowSurface(path,outDir)
     wf.base_dir = workdir
     wf.run(plugin=plugin, plugin_args=plugin_args)
+   #wf.run(plugin='MultiProc', plugin_args={'n_procs' : 28})
     
     
     

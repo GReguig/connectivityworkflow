@@ -2,11 +2,13 @@ setup.py
 connectivityworkflow/__init__.py
 connectivityworkflow/confounds_selector.py
 connectivityworkflow/connectivity_calculation.py
+connectivityworkflow/connectivity_utils.py
 connectivityworkflow/connectivity_workflow.py
 connectivityworkflow/data_bids_grabber.py
 connectivityworkflow/graph_nodes.py
 connectivityworkflow/graph_utils.py
 connectivityworkflow/signal_extraction_freesurfer.py
+connectivityworkflow/surface_processing.py
 connectivityworkflow/workflow_builder.py
 connectivityworkflow.egg-info/PKG-INFO
 connectivityworkflow.egg-info/SOURCES.txt

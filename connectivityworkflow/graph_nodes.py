@@ -71,8 +71,10 @@ def joinFeatures(data, output_dir, prefix, confName, kindConn):
         else:
             df[list(feature.keys())[0]] = featureVal
     outdir = opj(output_dir,"GraphMeasures")
-    if not os.path.exists(outdir):
+    try:
         os.makedirs(outdir)
+    except:
+        print("{} already exists".format(outdir))
     df.to_csv(opj(outdir,prefix+confName+kindConn+"GraphFeatures.tsv"),sep="\t")
     return df 
         

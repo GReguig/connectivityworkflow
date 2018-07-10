@@ -16,16 +16,18 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 plt.switch_backend("agg")
+
 """
 Class for Nilearn Interface
 """
+
 class NilearnBaseInterface(LibraryBaseInterface):
     _pkg = 'nilearn'
     
     
 class ConnectivityCalculationInputSpec(BaseInterfaceInputSpec):
     time_series = trait.traits.Array(mandatory=True, 
-                             desc=".tsv file containing a time serie for each RoI")
+                             desc="A 2-D array of time series : (timesteps x RoI)")
     kind = trait.traits.Enum('correlation', 'partial correlation', 'tangent', 'covariance', 'precision', usedefault="correlation",mandatory=False,  
                      desc="Measure of connectivity to compute, must be one of {'correlation', 'partial_correlation', 'tangent', 'covariance', 'precision'}. By default, correlation is used.")
     output_dir = trait.Directory(exists=False, mandatory=True, usedefault=".",
@@ -37,11 +39,13 @@ class ConnectivityCalculationInputSpec(BaseInterfaceInputSpec):
     plotName = trait.traits.Str(mandatory=False, usedefault=None,
                                 desc="Title of the connectivity matrix")
     prefix = trait.traits.Str(mandatory=False, usedefault="", desc="Prefix of the bids files")
+    mask = trait.traits.Array(mandatory=False, 
+                              desc="A 2-D array corresponding to a threshold mask : (nb of RoI x nb of RoI)", usedefault=None)
 
     
 class ConnectivityCalculationOutputSpec(TraitedSpec):
     connectivityMatrix = trait.traits.Array(desc="Matrix of connectivity computed")
-    dfPath = trait.traits.File(exists=True, desc="DataFrame containing the connectivity matrix")
+    dfPath = trait.traits.Str(desc="DataFrame containing the connectivity matrix")
     kind = trait.traits.Str(desc="Kind of connectivity calculated")
     
 class ConnectivityCalculation(NilearnBaseInterface, SimpleInterface):
@@ -67,6 +71,13 @@ class ConnectivityCalculation(NilearnBaseInterface, SimpleInterface):
         conn_matrix = conn_measure.fit_transform([time_series])[0]
         if self.inputs.absolute : 
             conn_matrix = np.absolute(conn_matrix)
+            
+        if isinstance(self.inputs.mask, np.ndarray):
+            try:
+                conn_matrix = conn_matrix * self.inputs.mask
+            except Exception as e:
+                print("Could not apply mask :\n {}".format(e))
+            
         #Set diagonal to 0
         np.fill_diagonal(conn_matrix, 0)
         print("Connectivity matrix computed.\nPlotting...")
@@ -78,6 +89,7 @@ class ConnectivityCalculation(NilearnBaseInterface, SimpleInterface):
         self._results["connectivityMatrix"] = conn_matrix
         self._results["dfPath"] = connMatrixPath+".tsv"
         self._results["kind"] = connKind
+            
         print("Connectivity calculation successfully finished")
         return runtime
                     
