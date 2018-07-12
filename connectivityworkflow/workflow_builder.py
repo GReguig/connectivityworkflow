@@ -24,7 +24,7 @@ def BuildConnectivityWorkflow(path, outDir):
     signalExtractor = Node(SignalExtractionFreeSurfer(), name="SignalExtractor")
     #Connectivity Calculation
     connectivityCalculator = Node(ConnectivityCalculation(), name="ConnectivityCalculator")
-    connectivityCalculator.iterables = [("kind", ["correlation", "covariance", "precision", "partial correlation"])]
+    connectivityCalculator.iterables = [("kind", ["correlation", "covariance", "precision", "partial correlation", "tangent"])]
     connectivityCalculator.inputs.absolute = True
     #Workflow connections
     connectivityWorkflow.connect([
@@ -108,7 +108,7 @@ def BuildConnectivityWorkflowSurface(path, outDir, lh_annot="/export/dataCENIR/u
                                                  ("prefix", "prefix")])
             ])
     ## GRAPH
-
+    """
     pandas2Graph = NodePandasAdj2Nx()
     #GraphFeature Calculator
     graphFeature = MapNode(Function(function=computeFeature, input_names=["graph","func","nameFeature"],
@@ -130,7 +130,7 @@ def BuildConnectivityWorkflowSurface(path, outDir, lh_annot="/export/dataCENIR/u
             (confoundsReader, joinFeatures, [("confName","confName")]),
             (connectivityCalculator, joinFeatures, [("kind", "kindConn")])
             ])
-
+    """
     return connectivityWorkflow
 
 ############################# T E S T ###########################
