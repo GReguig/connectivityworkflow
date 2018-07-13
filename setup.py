@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name="connectivityworkflow",
-      version="0.0.72",
+      version="0.0.74",
       description="A workflow for graph theory measure calculations from FMRI data",
       url="https://github.com/GReguig/connectivityworkflow",
       author="Reguig Ghiles",

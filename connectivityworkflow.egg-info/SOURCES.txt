@@ -7,6 +7,7 @@ connectivityworkflow/connectivity_workflow.py
 connectivityworkflow/data_bids_grabber.py
 connectivityworkflow/graph_nodes.py
 connectivityworkflow/graph_utils.py
+connectivityworkflow/metrics.py
 connectivityworkflow/signal_extraction_freesurfer.py
 connectivityworkflow/surface_processing.py
 connectivityworkflow/workflow_builder.py
